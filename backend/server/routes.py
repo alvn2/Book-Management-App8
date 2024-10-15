@@ -1,5 +1,5 @@
 from server import app, bcrypt, db
-from server.models import Users, Bookclub
+from server.models import Users, Bookclub, Book
 from flask import request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -54,3 +54,74 @@ def add_bookclub():
     db.session.add(bookclub)
     db.session.commit()
     return jsonify({'message': f'Bookclub {data["name"]} added successfully!'}), 201
+
+@app.route('/bookclubs')
+@login_required
+def get_bookclubs():
+    bookclubs = Bookclub.query.all()
+    bookcluns_list = []
+    for bookclub in bookclubs:
+        bookclub_dict = {
+            'name': bookclub.name,
+            'description': bookclub.description,
+            'owner': bookclub.owner.username
+        }
+
+        bookcluns_list.append(bookclub_dict)
+    return jsonify(bookcluns_list), 200
+
+@app.route('/bookclub/<int:id>')
+@login_required
+def get_bookclub(id):
+    bookclub = Bookclub.query.get_or_404(id)
+     
+    bookclub_dict = {
+        'name': bookclub.name,
+        'description': bookclub.description,
+        'owner': bookclub.owner.username
+    }
+    return jsonify(bookclub_dict), 200
+
+@app.route('/add-book/', methods=['POST', 'GET'])
+@login_required
+def add_book():
+    data = request.get_json()
+
+    book = Book(
+        book_title = data['book_title'],
+        book_author = data['book_author'],
+        description = data['description'],
+        book_club_id = data['book_club_id']
+    )
+    db.session.add(book)
+    db.session.commit()
+    return jsonify({'message': f'Book {data["book_title"]} added successfully!'}), 201
+
+@app.route('/books')
+@login_required
+def get_books():
+    books = Book.query.all()
+    
+    books_list = []
+    for book in books:
+        book_dict = {
+            'book_title': book.book_title,
+            'book_author': book.book_author,
+            'description': book.description,
+            'book_club': book.bookclub.name
+        }
+        books_list.append(book_dict)
+    return jsonify(books_list), 200
+
+@app.route('/book/<int:id>')
+@login_required
+def get_book(id):
+    book = Book.query.get_or_404(id)
+    
+    book_dict = {
+        'book_title': book.book_title,
+        'book_author': book.book_author,
+        'description': book.description,
+        'book_club': book.bookclub.name
+    }
+    return jsonify(book_dict), 200
