@@ -1,5 +1,5 @@
 from server import app, bcrypt, db
-from server.models import Users
+from server.models import Users, Bookclub
 from flask import request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -7,7 +7,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 def home():
     return '<h1>Home Page</h1>'
 
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['POST', 'GET'])
 def register():
     data = request.get_json()
 
@@ -25,7 +25,7 @@ def register():
     db.session.commit()
     return jsonify({'message': f'Account created for {data["username"]}!'}), 201
 
-@app.route('/login')
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     data = request.get_json()
 
@@ -35,3 +35,22 @@ def login():
         return jsonify({'message': f'User {user.username} logged in successfully!'}), 200
     else:
         return jsonify({'message': 'Login failed, please check your email or password.'}), 401
+    
+@app.route('/logout')
+def logout():
+    logout_user()
+    return jsonify({'message': 'User logged out successfully!'}), 200
+
+@app.route('/New-bookclub', methods=['POST', 'GET'])
+@login_required
+def add_bookclub():
+    data = request.get_json()
+
+    bookclub = Bookclub(
+        name = data['name'],
+        description = data['description'],
+        owner_id = current_user.id
+    )
+    db.session.add(bookclub)
+    db.session.commit()
+    return jsonify({'message': f'Bookclub {data["name"]} added successfully!'}), 201
