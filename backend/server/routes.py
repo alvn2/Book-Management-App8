@@ -1,6 +1,7 @@
 from server import app, bcrypt, db
 from server.models import Users
 from flask import request, jsonify
+from flask_login import login_user, current_user, logout_user, login_required
 
 @app.route('/')
 def home():
@@ -29,9 +30,8 @@ def login():
     data = request.get_json()
 
     user = Users.query.filter_by(email=data['email']).first()
-    if user and bcrypt.check_password_hash(user.passwor,data['password']):
-        return jsonify({'message': f'user {user.username} found'})
+    if user and bcrypt.check_password_hash(user.password, data['password']):
+        login_user(user)
+        return jsonify({'message': f'User {user.username} logged in successfully!'}), 200
     else:
-        return jsonify({'message': f'Login failed, please check username or password'})
-    
-    
+        return jsonify({'message': 'Login failed, please check your email or password.'}), 401
