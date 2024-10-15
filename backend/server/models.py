@@ -45,3 +45,10 @@ class Comments(db.Model):
     content = db.Column(db.Text, nullable=False)
     user = db.relationship('Users', backref='comments', lazy=True)
     book = db.relationship('Book', backref='comments', lazy=True)
+
+class Membership(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    bookclub_id = db.Column(db.Integer, db.ForeignKey('bookclub.id'), nullable=False)
+    user = db.relationship('Users', backref='memberships', lazy=True)
+    bookclub = db.relationship('Bookclub', backref='members', lazy=True)

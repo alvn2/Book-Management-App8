@@ -1,5 +1,5 @@
 from server import app, bcrypt, db
-from server.models import Users, Bookclub, Book, Comments
+from server.models import Users, Bookclub, Book, Comments, Membership
 from flask import request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -19,8 +19,11 @@ def register():
 
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     user = Users(
-        username = data['username'],email = data['email'],
-        image_file = data['image_file'],password = hashed_password) 
+        username = data['username'],
+        email = data['email'],
+        image_file = data['image_file'],
+        password = hashed_password
+        ) 
     db.session.add(user)
     db.session.commit()
     return jsonify({'message': f'User {data["username"]} registered successfully!'}), 201
@@ -78,6 +81,18 @@ def get_bookclub(id):
         'description': bookclub.description,
         'owner': bookclub.owner.username}
     return jsonify(bookclub_dict), 200
+
+@app.route('/bookclub/<int:id>/join', methods=['POST', 'GET'])
+@login_required
+def join_bookclub(id):
+    #existing_membership = Membership.query.filter_by(user_id=current_user.id, bookclub_id=bookclub_id).first()
+    #if existing_membership:
+     #   return jsonify({'message': 'You are already a member of this bookclub!'}), 200
+
+    #new_membership = Membership(user_id=current_user.id, bookclub_id=bookclub.id)
+    #db.session.add(new_membership)
+    #db.session.commit()
+    return jsonify({'message': 'You have successfully joined the book club!'}), 201
 
 @app.route('/add-book/', methods=['POST', 'GET'])
 @login_required
