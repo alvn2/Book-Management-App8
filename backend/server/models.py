@@ -21,8 +21,8 @@ class Bookclub(db.Model):
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text, nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    owner = db.relationship('Users', backref='owner', lazy=True)
-    books = db.relationship('Book', backref='bookclub', lazy=True)
+    owner = db.relationship('Users', backref='owned_bookclubs', lazy=True)
+    books = db.relationship('Book', back_populates='book_club', lazy=True)
 
     def __repr__(self):
         return f"Bookclub('{self.name}', '{self.description}')"
@@ -32,8 +32,8 @@ class Book(db.Model):
     book_title = db.Column(db.String(50), nullable=False)
     book_author = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    book_club_id = db.Column(db.Integer, db.ForeignKey('bookclub.id'), nullable=False)
-    book_club = db.relationship('Bookclub', backref='books', lazy=True)
+    book_club_id = db.Column(db.Integer, db.ForeignKey('bookclub.id'),default=None)
+    book_club = db.relationship('Bookclub', back_populates='books', lazy=True)
 
     def __repr__(self):
         return f"Book('{self.book_title}', '{self.book_author}', '{self.description}')"

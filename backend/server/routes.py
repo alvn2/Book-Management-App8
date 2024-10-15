@@ -4,11 +4,14 @@ from flask import request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 
 @app.route('/')
+@login_required
 def home():
     return '<h1>Home Page</h1>'
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
+    if current_user.is_authenticated:
+        return jsonify({'message': 'User already logged in!'}), 200
     data = request.get_json()
 
     if Users.query.filter_by(email=data['email']).first():
@@ -21,12 +24,15 @@ def register():
         image_file = data['image_file'],
         password = hashed_password
     )
+   
     db.session.add(user)
     db.session.commit()
-    return jsonify({'message': f'Account created for {data["username"]}!'}), 201
+    return jsonify({'message': f'User {data["username"]} registered successfully!'}), 201
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    if current_user.is_authenticated:
+        return jsonify({'message': 'User already logged in!'}), 200
     data = request.get_json()
 
     user = Users.query.filter_by(email=data['email']).first()
@@ -98,7 +104,7 @@ def add_book():
     return jsonify({'message': f'Book {data["book_title"]} added successfully!'}), 201
 
 @app.route('/books')
-@login_required
+
 def get_books():
     books = Book.query.all()
     
@@ -108,7 +114,7 @@ def get_books():
             'book_title': book.book_title,
             'book_author': book.book_author,
             'description': book.description,
-            'book_club': book.bookclub.name
+            'book_club_id': book.book_club_id
         }
         books_list.append(book_dict)
     return jsonify(books_list), 200
