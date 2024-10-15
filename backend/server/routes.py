@@ -19,12 +19,8 @@ def register():
 
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     user = Users(
-        username = data['username'],
-        email = data['email'],
-        image_file = data['image_file'],
-        password = hashed_password
-    )
-   
+        username = data['username'],email = data['email'],
+        image_file = data['image_file'],password = hashed_password) 
     db.session.add(user)
     db.session.commit()
     return jsonify({'message': f'User {data["username"]} registered successfully!'}), 201
@@ -80,8 +76,7 @@ def get_bookclub(id):
     bookclub_dict = {
         'name': bookclub.name,
         'description': bookclub.description,
-        'owner': bookclub.owner.username
-    }
+        'owner': bookclub.owner.username}
     return jsonify(bookclub_dict), 200
 
 @app.route('/add-book/', methods=['POST', 'GET'])
@@ -94,7 +89,7 @@ def add_book():
         book_author = data['book_author'],
         description = data['description'],
         book_club_id = data['book_club_id']
-    )
+        )
     db.session.add(book)
     db.session.commit()
     return jsonify({'message': f'Book {data["book_title"]} added successfully!'}), 201
@@ -110,7 +105,7 @@ def get_books():
             'book_author': book.book_author,
             'description': book.description,
             'book_club_id': book.book_club_id
-        }
+            }
         books_list.append(book_dict)
     return jsonify(books_list), 200
 
@@ -123,7 +118,7 @@ def get_book(id):
         'book_author': book.book_author,
         'description': book.description,
         'book_club': book.bookclub.name
-    }
+        }
     return jsonify(book_dict), 200
 
 @app.route('/delete-book/<int:id>', methods=['DELETE'])
@@ -141,11 +136,7 @@ def delete_book(id):
 @login_required
 def add_comment():
     data = request.get_json()
-    comment = Comments(
-        user_id = current_user.id,
-        book_id = data['book_id'],
-        content = data['content']
-    )
+    comment = Comments(user_id = current_user.id,book_id = data['book_id'], content = data['content'])
     db.session.add(comment)
     db.session.commit()
     return jsonify({'message': 'Comment added successfully!'}), 201
@@ -159,7 +150,7 @@ def get_comments():
             'user': comment.user.username,
             'book': comment.book.book_title,
             'content': comment.content
-        }
+            }
         comments_list.append(comment_dict)
     return jsonify(comments_list), 200
 
