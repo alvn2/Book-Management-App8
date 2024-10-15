@@ -37,3 +37,11 @@ class Book(db.Model):
 
     def __repr__(self):
         return f"Book('{self.book_title}', '{self.book_author}', '{self.description}')"
+
+class Comments(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    user = db.relationship('Users', backref='comments', lazy=True)
+    book = db.relationship('Book', backref='comments', lazy=True)
