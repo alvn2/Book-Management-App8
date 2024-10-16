@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
 from server import app, db
-from server.models import Book
+from server.models import Book, Users, Bookclub
 
 with app.app_context():
 
-    # This will delete any existing rows
-    # so you can run the seed file multiple times without having duplicate entries in your database
     print("Deleting data...")
     Book.query.delete()
 
@@ -36,5 +34,43 @@ with app.app_context():
     print("Creating book list...")
     db.session.add_all(books)
     db.session.commit() 
+
+    print("Deleting data...")
+    Users.query.delete()
+    
+    print ("Creating user list...")
+    user1 = Users(username="admin", email="admin@book-list.com", password="testing", image_file="default.png")
+    user2 = Users(username="user", email="second@gmail.com", password="testing", image_file="default.png")
+    user3 = Users(username="user2", email="third@gmail.com", password="testing", image_file="default.png")
+    user4 = Users(username="user3", email="fourth@gmail.com", password="testing", image_file="default.png")
+    user5 = Users(username="user4", email="fifth@gmail.com", password="testing", image_file="default.png")
+
+    users = [user1, user2, user3, user4, user5]
+
+    print("Creating users...")
+    db.session.add_all(users)
+    db.session.commit()
+
+    print("Deleting data...")
+    Bookclub.query.delete()
+
+    print("Creating bookclubs...")
+    bookclub1 = Bookclub(
+        name="Bookclub 1", description="A bookclub for the classics.", owner_id=1)
+    bookclub2 = Bookclub(
+        name="Bookclub 2", description="A bookclub for the modern reader.", owner_id=2)
+    bookclub3 = Bookclub(
+        name="Bookclub 3", description="A bookclub for the adventurous reader.", owner_id=3)
+    bookclub4 = Bookclub(
+        name="Bookclub 4", description="A bookclub for the romantic at heart.", owner_id=4)
+    bookclub5 = Bookclub(
+        name="Bookclub 5", description="A bookclub for the mystery lover.", owner_id=5)
+    
+    bookclubs = [bookclub1, bookclub2, bookclub3, bookclub4, bookclub5]
+
+    print("Creating bookclubs...")
+    db.session.add_all(bookclubs)
+    db.session.commit()
+
 
     print("Seeding done!")

@@ -6,7 +6,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 @app.route('/')
 @login_required
 def home():
-    return '<h1>Home Page</h1>'
+    return jsonify({'message': f'{current_user.username}!'}), 200
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -79,19 +79,20 @@ def get_bookclub(id):
     bookclub_dict = {
         'name': bookclub.name,
         'description': bookclub.description,
-        'owner': bookclub.owner.username}
+        'owner': bookclub.owner.username
+        }
     return jsonify(bookclub_dict), 200
 
 @app.route('/bookclub/<int:id>/join', methods=['POST', 'GET'])
 @login_required
 def join_bookclub(id):
-    #existing_membership = Membership.query.filter_by(user_id=current_user.id, bookclub_id=bookclub_id).first()
-    #if existing_membership:
-     #   return jsonify({'message': 'You are already a member of this bookclub!'}), 200
+    existing_membership = Membership.query.filter_by(user_id=current_user.id, bookclub_id=id).first()
+    if existing_membership:
+        return jsonify({'message': 'You are already a member of this bookclub!'}), 200
 
-    #new_membership = Membership(user_id=current_user.id, bookclub_id=bookclub.id)
-    #db.session.add(new_membership)
-    #db.session.commit()
+    new_membership = Membership(user_id=current_user.id, bookclub_id=id)
+    db.session.add(new_membership)
+    db.session.commit()
     return jsonify({'message': 'You have successfully joined the book club!'}), 201
 
 @app.route('/add-book/', methods=['POST', 'GET'])
@@ -110,7 +111,7 @@ def add_book():
     return jsonify({'message': f'Book {data["book_title"]} added successfully!'}), 201
 
 @app.route('/books')
-
+@login_required
 def get_books():
     books = Book.query.all()
     books_list = []
@@ -132,7 +133,7 @@ def get_book(id):
         'book_title': book.book_title,
         'book_author': book.book_author,
         'description': book.description,
-        'book_club': book.bookclub.name
+        'book_club': book.book_club_id
         }
     return jsonify(book_dict), 200
 
